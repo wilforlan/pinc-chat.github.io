@@ -1,6 +1,6 @@
 var socketUrl = 'ws://localhost:3000/cable';
 var endpoint = "http://localhost:3000/api";
-var base_endpoint = window.location.href
+var base_endpoint = 'https://wilforlan.github.io/pinc-chat.github.io'
 window.search_in_progress = false;
 var setUserCredentials = function(params){
 	localStorage.setItem('chat_auth_credential', JSON.stringify(params));
