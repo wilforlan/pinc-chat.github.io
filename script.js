@@ -1,5 +1,5 @@
-var socketUrl = 'ws://localhost:3000/cable';
-var endpoint = "http://localhost:3000/api";
+var socketUrl = 'wss://apinew.pincapp.com/cable';
+var endpoint = "https://apinew.pincapp.com/api";
 var base_endpoint = 'https://wilforlan.github.io/pinc-chat.github.io'
 window.search_in_progress = false;
 var setUserCredentials = function(params){
