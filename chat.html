@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 0 20px;
+}
+
+.container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.darker {
+    border-color: #ccc;
+    background-color: #ddd;
+}
+
+.container::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.container img {
+    float: left;
+    max-width: 60px;
+    width: 100%;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+
+.container img.right {
+    float: right;
+    margin-left: 20px;
+    margin-right:0;
+}
+
+.time-right {
+    float: right;
+    color: #aaa;
+}
+
+.time-left {
+    float: left;
+    color: #999;
+}
+</style>
+</head>
+<body>
+
+<h2>Chat Messages</h2>
+
+<div class="container" id="chat_loader">
+  <!-- <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:100%;"> -->
+  <!-- <p>Hello. How are you today?</p>
+  <span class="time-right">11:00</span> -->
+</div>
+
+<div class="container">
+	<textarea id="message_container" style="width: 100%" placeholder="Type message here"></textarea>
+	<button id="send_message_btn">Send Message</button>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+    window.onload=function(){
+        mandateLogin();
+        initChat();
+    }
+	var url_string = window.location.href; //window.location.href
+	var url = new URL(url_string);
+	var other_user_id = url.searchParams.get("other_user");
+    var UNIVERSAL_CHAT_ID = '';
+
+    var credentials = getUserCrendentials();
+
+
+    var initChat = function(){
+        console.log('Start Init')
+        initChatID(other_user_id)
+            .done(function(data){
+                var response = data.data.current_user_chat;
+                UNIVERSAL_CHAT_ID = response.id
+                
+                initChatHistory(other_user_id, UNIVERSAL_CHAT_ID)
+                    .done(function(data){
+                        var c_response = data.data.chats;
+                        console.log(c_response);
+                        if(!c_response.length){
+                            $('div#chat_loader').html('<h4> Start a conversation..</h4>');
+                            return ;
+                        }
+                        var foo = [];
+                        for (var i = 0; i < c_response.length; i++) {
+                            foo.push($(`<h4>Username: ${c_response[i].from_username}</h4><p>Message: ${c_response[i].message}</p>
+                                <span class="time-right">${c_response[i].message_created_at}</span>`))
+                        }
+
+                        $.each(foo, function(){
+                            $('div#chat_loader').append(this);
+                        })
+
+                        var ws = new WebSocket(`${socketUrl}/?token=${credentials['access-token']}&client=${credentials['client']}&uid=${credentials['uid']}`);
+
+                        var subscribe_params = JSON.stringify({
+      command: 'subscribe',
+      identifier: JSON.stringify({
+        chat_id: UNIVERSAL_CHAT_ID,
+        channel: 'MessagesChannel'
+      })
+    });
+
+    ws.onopen = function() {
+      console.log('onopen ------');
+      // SUBSCRIBE
+      ws.send(subscribe_params);
+    };
+
+    ws.onmessage = function (evt) {
+      var received_data = JSON.parse(evt.data || '{}');
+      var data_identifier = JSON.parse(received_data.identifier || '{}');
+      var message_data = received_data.message;
+      // console.log(received_data);
+
+      if (
+        received_data.identifier &&
+        data_identifier.channel === 'MessagesChannel' &&
+        data_identifier.chat_id === UNIVERSAL_CHAT_ID &&
+        message_data
+      ) {
+        var log_d = received_data.message;
+        var stdout = $(`<h4>Username: ${log_d.from_username}</h4><p>Message: ${log_d.message}</p>
+                                <span class="time-right">${log_d.message_created_at}</span>`)
+        $('div#chat_loader').append(stdout)
+      } else {
+        // console.log('socket message received...', evt.data);
+      }
+    };
+
+    ws.onclose = function() {
+      console.log("Connection is closed...");
+    };
+                })
+        })
+    }
+
+    
+
+    $('#send_message_btn').click(function(e){
+        e.preventDefault();
+        sendNewMessage($("#message_container").val(), UNIVERSAL_CHAT_ID).done(function(data){
+
+        });
+    })
+</script>
+</body>
+</html>
