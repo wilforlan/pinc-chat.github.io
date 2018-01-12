@@ -1,6 +1,6 @@
 var socketUrl = 'ws://localhost:3000/cable';
 var endpoint = "http://localhost:3000/api";
-var base_endpoint = "http://localhost:5000"
+var base_endpoint = window.location.href
 window.search_in_progress = false;
 var setUserCredentials = function(params){
 	localStorage.setItem('chat_auth_credential', JSON.stringify(params));
@@ -38,13 +38,13 @@ var pullResponseHeaders = function(request){
 
 var mandateLogin = function(){
 	if (!localStorage.getItem('chat_auth_credential_loggedin')) {
-		window.location.replace("/login.html");
+		window.location.replace(base_endpoint+"/login.html");
 	}
 }
 
 var checkLogin = function(){
 	if (localStorage.getItem('chat_auth_credential_loggedin')) {
-		window.location.replace("/");
+		window.location.replace(base_endpoint+"/");
 	}
 }
 
