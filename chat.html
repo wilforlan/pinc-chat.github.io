@@ -90,26 +90,7 @@ body {
             .done(function(data){
                 var response = data.data.current_user_chat;
                 UNIVERSAL_CHAT_ID = response.id
-                
-                initChatHistory(other_user_id, UNIVERSAL_CHAT_ID)
-                    .done(function(data){
-                        var c_response = data.data.chats;
-                        console.log(c_response);
-                        if(!c_response.length){
-                            $('div#chat_loader').html('<h4> Start a conversation..</h4>');
-                            return ;
-                        }
-                        var foo = [];
-                        for (var i = 0; i < c_response.length; i++) {
-                            foo.push($(`<h4>Username: ${c_response[i].from_username}</h4><p>Message: ${c_response[i].message}</p>
-                                <span class="time-right">${c_response[i].message_created_at}</span>`))
-                        }
-
-                        $.each(foo, function(){
-                            $('div#chat_loader').append(this);
-                        })
-
-                        var ws = new WebSocket(`${socketUrl}/?token=${credentials['access-token']}&client=${credentials['client']}&uid=${credentials['uid']}`);
+                var ws = new WebSocket(`${socketUrl}/?token=${credentials['access-token']}&client=${credentials['client']}&uid=${credentials['uid']}`);
 
                         var subscribe_params = JSON.stringify({
       command: 'subscribe',
@@ -149,6 +130,25 @@ body {
     ws.onclose = function() {
       console.log("Connection is closed...");
     };
+                initChatHistory(other_user_id, UNIVERSAL_CHAT_ID)
+                    .done(function(data){
+                        var c_response = data.data.chats;
+                        console.log(c_response);
+                        if(!c_response.length){
+                            $('div#chat_loader').html('<h4> Start a conversation..</h4>');
+                            return ;
+                        }
+                        var foo = [];
+                        for (var i = 0; i < c_response.length; i++) {
+                            foo.push($(`<h4>Username: ${c_response[i].from_username}</h4><p>Message: ${c_response[i].message}</p>
+                                <span class="time-right">${c_response[i].message_created_at}</span>`))
+                        }
+
+                        $.each(foo, function(){
+                            $('div#chat_loader').append(this);
+                        })
+
+                        
                 })
         })
     }
