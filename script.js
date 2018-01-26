@@ -1,10 +1,10 @@
-// var socketUrl = 'wss://apinew.pincapp.com/cable';
-// var endpoint = "https://apinew.pincapp.com/api";
-// var base_endpoint = 'https://wilforlan.github.io/pinc-chat.github.io'
+var socketUrl = 'wss://apinew.pincapp.com/cable';
+var endpoint = "https://apinew.pincapp.com/api";
+var base_endpoint = 'https://wilforlan.github.io/pinc-chat.github.io'
 
-var socketUrl = 'ws://localhost:3000/cable';
-var endpoint = "http://localhost:3000/api";
-var base_endpoint = 'http://localhost:5000'
+// var socketUrl = 'ws://localhost:3000/cable';
+// var endpoint = "http://localhost:3000/api";
+// var base_endpoint = 'http://localhost:5000'
 
 window.search_in_progress = false;
 var setUserCredentials = function(params){
