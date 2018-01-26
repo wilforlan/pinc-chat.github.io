@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style> 
+input[type=text] {
+    width: 130px;
+    box-sizing: border-box;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+    background-color: white;
+    background-position: 10px 10px; 
+    background-repeat: no-repeat;
+    padding: 12px 20px 12px 40px;
+    -webkit-transition: width 0.4s ease-in-out;
+    transition: width 0.4s ease-in-out;
+}
+
+input[type=text]:focus {
+    width: 100%;
+}
+
+#myUL, #prevchat {
+    /* Remove default list styling */
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    margin-top: 20px;
+}
+
+#myUL li a, #prevchat li a {
+    border: 1px solid #ddd; /* Add a border to all links */
+    margin-top: -1px; /* Prevent double borders */
+    background-color: #f6f6f6; /* Grey background color */
+    padding: 12px; /* Add some padding */
+    text-decoration: none; /* Remove default text underline */
+    font-size: 18px; /* Increase the font-size */
+    color: black; /* Add a black text color */
+    display: block; /* Make it into a block element to fill the whole list */
+}
+
+#myUL li a:hover:not(.header), #prevchat li a:hover:not(.header) {
+    background-color: #eee; /* Add a hover effect to all links, except for headers */
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  -webkit-animation: spin 2s linear infinite; /* Safari */
+  animation: spin 2s linear infinite;
+  margin-top: 40px;
+}
+
+/* Safari */
+@-webkit-keyframes spin {
+  0% { -webkit-transform: rotate(0deg); }
+  100% { -webkit-transform: rotate(360deg); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+
+<p>Pick a question</p>
+
+<ul id="myUL">
+  <!-- <li>
+  	<a href="http://localhost:5000/chat.html?other_user=1" >Adele</a>
+  </li> -->
+</ul>
+
+<h4>List of Previous Chats</h4>
+<ul id="prevchat">
+  <!-- <li>
+  	<a href="http://localhost:5000/chat.html?other_user=1" >Adele</a>
+  </li> -->
+</ul>
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+	window.onload=function(){
+		mandateLogin();
+		loadQuestionList();
+	}
+
+	var loadQuestionList = function(){
+		console.log('In here too')
+		loadQuestions()
+			.done(function(data){
+				var response = data.data;
+				if(!response.length){
+					$('ul#prevchat').html('<h4> No Questions</h4>');
+					return ;
+				}
+				var foo = [];
+				for (var i = 0; i < response.length; i++) {
+					foo.push($(`<li><a href='${base_endpoint}/single_question.html?id=${response[i].id}&text=${response[i].attributes.text}' >${response[i].attributes.text}</a></li>`))
+				}
+
+				$.each(foo, function(){
+			        $('ul#prevchat').append(this);
+			    })
+		})
+	}
+</script>
+
+</body>
+
+</html>

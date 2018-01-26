@@ -1,6 +1,11 @@
-var socketUrl = 'wss://apinew.pincapp.com/cable';
-var endpoint = "https://apinew.pincapp.com/api";
-var base_endpoint = 'https://wilforlan.github.io/pinc-chat.github.io'
+// var socketUrl = 'wss://apinew.pincapp.com/cable';
+// var endpoint = "https://apinew.pincapp.com/api";
+// var base_endpoint = 'https://wilforlan.github.io/pinc-chat.github.io'
+
+var socketUrl = 'ws://localhost:3000/cable';
+var endpoint = "http://localhost:3000/api";
+var base_endpoint = 'http://localhost:5000'
+
 window.search_in_progress = false;
 var setUserCredentials = function(params){
 	localStorage.setItem('chat_auth_credential', JSON.stringify(params));
@@ -85,6 +90,16 @@ var loadChat = function(){
 	});
 }
 
+var loadQuestions = function(){
+	console.log('Loading Questions')
+	return $.ajax({
+	    type: "GET",
+	    url: endpoint + `/questions`,
+	    headers: getUserCrendentials(),
+	    dataType: "json",
+	});
+}
+
 
 var initChatID = function(other_user){
 	console.log('Init Chat ID')
@@ -106,6 +121,16 @@ var initChatHistory = function(other_user, chat_id){
 	});
 }
 
+var initAnswersHistory = function(question_id){
+	console.log('Fetch Question History')
+	return $.ajax({
+	    type: "GET",
+	    url: endpoint + `/questions/${question_id}/answers`,
+	    headers: getUserCrendentials(),
+	    dataType: "json",
+	});
+}
+
 var sendNewMessage = function(content, chat_id){
 	console.log('Sending Message')
 	return $.ajax({
@@ -117,6 +142,23 @@ var sendNewMessage = function(content, chat_id){
 	    	message : {
 	    		content: content,
 	    		chat_id: chat_id
+	    	}
+	    }
+	});
+}
+
+
+var sendNewAnswer = function(text, question_id){
+	console.log('Sending Message')
+	return $.ajax({
+	    type: "POST",
+	    url: endpoint + `/answers`,
+	    headers: getUserCrendentials(),
+	    dataType: "json",
+	    data: {
+	    	answer : {
+	    		text: text,
+	    		question_id: question_id
 	    	}
 	    }
 	});

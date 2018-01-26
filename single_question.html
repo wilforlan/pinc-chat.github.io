@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {
+    margin: 0 auto;
+    max-width: 800px;
+    padding: 0 20px;
+}
+
+.container {
+    border: 2px solid #dedede;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.darker {
+    border-color: #ccc;
+    background-color: #ddd;
+}
+
+.container::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+.container img {
+    float: left;
+    max-width: 60px;
+    width: 100%;
+    margin-right: 20px;
+    border-radius: 50%;
+}
+
+.container img.right {
+    float: right;
+    margin-left: 20px;
+    margin-right:0;
+}
+
+.time-right {
+    float: right;
+    color: #aaa;
+}
+
+.time-left {
+    float: left;
+    color: #999;
+}
+</style>
+</head>
+<body>
+
+<h1>Question Answers</h1>
+
+<h3 id="question_text"></h3>
+<div class="container" id="chat_loader">
+  <!-- <img src="/w3images/bandmember.jpg" alt="Avatar" style="width:100%;"> -->
+  <!-- <p>Hello. How are you today?</p>
+  <span class="time-right">11:00</span> -->
+</div>
+
+<div class="container">
+	<textarea id="message_container" style="width: 100%" placeholder="Type message here"></textarea>
+	<button id="send_message_btn">Send Answer</button>
+</div>
+
+
+<script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="script.js"></script>
+<script type="text/javascript">
+    window.onload=function(){
+        mandateLogin();
+        initChat();
+    }
+	var url_string = window.location.href; //window.location.href
+	var url = new URL(url_string);
+    var question_id = url.searchParams.get("id");
+    var question_text = url.searchParams.get("text");
+
+    console.log(question_text);
+    $("#question_text").html("Question:"+ question_text);
+
+    var credentials = getUserCrendentials();
+
+
+    var initChat = function(){
+                var ws = new WebSocket(`${socketUrl}/?token=${credentials['access-token']}&client=${credentials['client']}&uid=${credentials['uid']}`);
+
+                            var subscribe_params = JSON.stringify({
+                  command: 'subscribe',
+                  identifier: JSON.stringify({
+                    question_id: question_id,
+                    channel: 'AnswersChannel'
+                  })
+                });
+
+    ws.onopen = function() {
+      console.log('onopen ------');
+      // SUBSCRIBE
+      ws.send(subscribe_params);
+    };
+
+    ws.onmessage = function (evt) {
+      var received_data = JSON.parse(evt.data || '{}');
+      var data_identifier = JSON.parse(received_data.identifier || '{}');
+      var message_data = received_data.message;
+      // console.log("message_data", message_data);
+
+      if (
+        received_data.identifier &&
+        data_identifier.channel === 'AnswersChannel' &&
+        data_identifier.question_id === question_id &&
+        message_data
+      ) {
+        var log_d = received_data.message;
+        console.log("log_d", log_d)
+        var stdout = $(`<h4>Author: ${log_d.answer_author_name}</h4><p>Message: ${log_d.answer_text}</p>
+                                `)
+        $('div#chat_loader').append(stdout)
+      } else {
+        // console.log('socket message received...', evt.data);
+      }
+    };
+
+    ws.onclose = function() {
+      console.log("Connection is closed...");
+    };
+                initAnswersHistory(question_id)
+                    .done(function(data){
+                        var c_response = data.data;
+                        console.log(c_response);
+                        if(!c_response.length){
+                            $('div#chat_loader').html('<h4> Start a conversation..</h4>');
+                            return ;
+                        }
+                        var foo = [];
+                        for (var i = 0; i < c_response.length; i++) {
+                            foo.push($(`<h4>Author: ${c_response[i].attributes.author_info.name}</h4><p>Message: ${c_response[i].attributes.text}</p>
+                                `))
+                        }
+
+                        $.each(foo, function(){
+                            $('div#chat_loader').append(this);
+                        })
+
+                        
+                })
+    }
+
+    
+
+    $('#send_message_btn').click(function(e){
+        e.preventDefault();
+        sendNewAnswer($("#message_container").val(), question_id).done(function(data){
+            console.log("Answer Sent")
+        });
+    })
+</script>
+</body>
+</html>
