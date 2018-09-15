@@ -1,5 +1,5 @@
-var socketUrl = 'wss://apinew.pincapp.com/cable';
-var endpoint = "https://apinew.pincapp.com/api";
+var socketUrl = 'wss://api.divercity.io/cable';
+var endpoint = "https://api.divercity.io/api";
 var base_endpoint = 'https://wilforlan.github.io/pinc-chat.github.io'
 
 // var socketUrl = 'ws://localhost:3000/cable';
@@ -94,7 +94,7 @@ var loadQuestions = function(){
 	console.log('Loading Questions')
 	return $.ajax({
 	    type: "GET",
-	    url: endpoint + `/questions`,
+	    url: endpoint + `/questions?page[size]=2`,
 	    headers: getUserCrendentials(),
 	    dataType: "json",
 	});
@@ -161,6 +161,24 @@ var sendNewAnswer = function(text, question_id){
 	    		question_id: question_id
 	    	}
 	    }
+	});
+}
+
+var sendRtmEvent = function(type, typing_user_id, chat_id){
+	console.log('Sending Event ', type)
+	console.log(arguments);
+	return $.ajax({
+	    type: "POST",
+	    url: endpoint + `/rtm/events`,
+	    headers: getUserCrendentials(),
+	    dataType: "json",
+	    data: {
+			"rtm" : {
+				"event": type,
+				"chat_id": chat_id,
+				"typing_user_id": typing_user_id
+			}
+		}
 	});
 }
 

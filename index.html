@@ -131,7 +131,7 @@ input[type=text]:focus {
 				}
 				var foo = [];
 				for (var i = 0; i < response.length; i++) {
-					foo.push($(`<li><a href='${base_endpoint}/chat.html?other_user=${response[i].id}' >${response[i].name}</a></li>`))
+					foo.push($(`<li><a href='${base_endpoint}/chat.html?other_user=${response[i].id}' >${response[i].name}<br/><p>last message: ${response[i].last_message}</p></a></li>`))
 				}
 
 				$.each(foo, function(){

@@ -64,6 +64,7 @@ body {
 </div>
 
 <div class="container">
+    <p id="typing-area"></p>
 	<textarea id="message_container" style="width: 100%" placeholder="Type message here"></textarea>
 	<button id="send_message_btn">Send Message</button>
 </div>
@@ -110,7 +111,7 @@ body {
       var received_data = JSON.parse(evt.data || '{}');
       var data_identifier = JSON.parse(received_data.identifier || '{}');
       var message_data = received_data.message;
-      // console.log(received_data);
+    //   console.log(received_data);
 
       if (
         received_data.identifier &&
@@ -119,9 +120,17 @@ body {
         message_data
       ) {
         var log_d = received_data.message;
-        var stdout = $(`<h4>Username: ${log_d.from_username}</h4><p>Message: ${log_d.message}</p>
+        console.log(log_d);
+        if (log_d.event_type && log_d.event_type.match(/rtm/)) {
+            if (parseInt(other_user_id) === parseInt(log_d.typing_user_id)) {
+                if (log_d.event_sub_type === 'start_chat_typing') $('p#typing-area').text(log_d.message);
+                if (log_d.event_sub_type === 'end_chat_typing') $('p#typing-area').text('');   
+            }
+        }else{
+            var stdout = $(`<h4>Username: ${log_d.from_username}</h4><p>Message: ${log_d.message}</p>
                                 <span class="time-right">${log_d.message_created_at}</span>`)
-        $('div#chat_loader').append(stdout)
+            $('div#chat_loader').append(stdout)
+        }
       } else {
         // console.log('socket message received...', evt.data);
       }
@@ -161,6 +170,23 @@ body {
 
         });
     })
+
+    var rtm_sent = false;
+    $('#message_container').on('input propertychange paste', function() {
+        // do your stuff
+        if (!rtm_sent) {
+            sendRtmEvent('start_chat_typing', getCurrentUser().id, UNIVERSAL_CHAT_ID).done(function(){
+                rtm_sent = true
+            });
+        }
+    });
+
+    $('#message_container').focusout(function() {
+        sendRtmEvent('end_chat_typing', getCurrentUser().id, UNIVERSAL_CHAT_ID).done(function(){
+            rtm_sent = false
+        });
+    });
+
 </script>
 </body>
 </html>

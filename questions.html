@@ -88,7 +88,8 @@ input[type=text]:focus {
 <script type="text/javascript">
 	window.onload=function(){
 		mandateLogin();
-		loadQuestionList();
+        loadQuestionList();
+        initChat();
 	}
 
 	var loadQuestionList = function(){
@@ -109,7 +110,48 @@ input[type=text]:focus {
 			        $('ul#prevchat').append(this);
 			    })
 		})
-	}
+    }
+    
+    var credentials = getUserCrendentials();
+
+
+var initChat = function(){
+            var ws = new WebSocket(`${socketUrl}/?token=${credentials['access-token']}&client=${credentials['client']}&uid=${credentials['uid']}`);
+
+                        var subscribe_params = JSON.stringify({
+              command: 'subscribe',
+              identifier: JSON.stringify({
+                group_of_interest_id: 115,
+                channel: 'QuestionsChannel'
+              })
+            });
+
+ws.onopen = function() {
+  console.log('onopen ------');
+  // SUBSCRIBE
+  ws.send(subscribe_params);
+};
+
+ws.onmessage = function (evt) {
+  var received_data = JSON.parse(evt.data || '{}');
+  var data_identifier = JSON.parse(received_data.identifier || '{}');
+  var message_data = received_data.message;
+//   console.log("message_data", message_data);
+//   console.log("data_identifier", data_identifier);
+
+  if (
+    received_data.identifier &&
+    data_identifier.channel === 'QuestionsChannel' &&
+    data_identifier.group_of_interest_id === 115 &&
+    message_data
+  ) {
+    var log_d = received_data.message;
+    console.log("log_d", log_d)
+  } else {
+    // console.log('socket message received...', evt.data);
+  }
+};
+}
 </script>
 
 </body>
