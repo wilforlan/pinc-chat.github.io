@@ -89,9 +89,10 @@ body {
         console.log('Start Init')
         initChatID(other_user_id)
             .done(function(data){
-                var response = data.data.current_user_chat;
+                var response = data.data;
                 UNIVERSAL_CHAT_ID = response.id
                 var ws = new WebSocket(`${socketUrl}/?token=${credentials['access-token']}&client=${credentials['client']}&uid=${credentials['uid']}`);
+                // var ws = new WebSocket("wss://api.divercity.io/cable/?token=1b-Ob_ElshD1oPmSaDKEGQ&client=k96tf6ooqi0ILWWRv22zuQ&uid=andreasbraun117@hotmail.com");
 
                         var subscribe_params = JSON.stringify({
       command: 'subscribe',
@@ -111,7 +112,7 @@ body {
       var received_data = JSON.parse(evt.data || '{}');
       var data_identifier = JSON.parse(received_data.identifier || '{}');
       var message_data = received_data.message;
-    //   console.log(received_data);
+      console.log(received_data);
 
       if (
         received_data.identifier &&
@@ -171,19 +172,20 @@ body {
         });
     })
 
-    var rtm_sent = false;
+    window.rtm_sent = 'no';
     $('#message_container').on('input propertychange paste', function() {
         // do your stuff
-        if (!rtm_sent) {
+        if ( window.rtm_sent == 'no') {
             sendRtmEvent('start_chat_typing', getCurrentUser().id, UNIVERSAL_CHAT_ID).done(function(){
-                rtm_sent = true
+                // rtm_sent = 'sent'
             });
         }
+        window.rtm_sent = 'started'
     });
 
     $('#message_container').focusout(function() {
         sendRtmEvent('end_chat_typing', getCurrentUser().id, UNIVERSAL_CHAT_ID).done(function(){
-            rtm_sent = false
+            window.rtm_sent = 'no'
         });
     });
 

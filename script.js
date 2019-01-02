@@ -1,10 +1,19 @@
-var socketUrl = 'wss://api.divercity.io/cable';
-var endpoint = "https://api.divercity.io/api";
-var base_endpoint = 'https://wilforlan.github.io/pinc-chat.github.io'
+var socketUrl,
+	endpoint,
+	base_endpoint;
 
-// var socketUrl = 'ws://localhost:3000/cable';
-// var endpoint = "http://localhost:3000/api";
-// var base_endpoint = 'http://localhost:5000'
+if (window.location.host.includes('local')) {
+	// socketUrl = 'ws://localhost:3000/cable';
+	// endpoint = "http://localhost:3000/api";
+	socketUrl = 'wss://dev-api.divercity.io/cable';
+	endpoint = "https://dev-api.divercity.io/api";
+
+	base_endpoint = 'http://localhost:5000'
+}else{
+	socketUrl = 'wss://dev-api.divercity.io/cable';
+	endpoint = "https://dev-api.divercity.io/api";
+	base_endpoint = 'https://wilforlan.github.io/pinc-chat.github.io'
+}
 
 window.search_in_progress = false;
 var setUserCredentials = function(params){
@@ -163,6 +172,21 @@ var sendNewAnswer = function(text, question_id){
 	    }
 	});
 }
+
+const debounce = (func, wait, immediate) => {
+	var timeout;
+	return function() {
+		var context = this, args = arguments;
+		var later = function() {
+			timeout = null;
+			if (!immediate) func.apply(context, args);
+		};
+		var callNow = immediate && !timeout;
+		clearTimeout(timeout);
+		timeout = setTimeout(later, wait);
+		if (callNow) func.apply(context, args);
+	}.bind(this);
+};
 
 var sendRtmEvent = function(type, typing_user_id, chat_id){
 	console.log('Sending Event ', type)
