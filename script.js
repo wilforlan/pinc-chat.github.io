@@ -3,10 +3,10 @@ var socketUrl,
 	base_endpoint;
 
 if (window.location.host.includes('local')) {
-	// socketUrl = 'ws://localhost:3000/cable';
-	// endpoint = "http://localhost:3000/api";
-	socketUrl = 'wss://dev-api.divercity.io/cable';
-	endpoint = "https://dev-api.divercity.io/api";
+	socketUrl = 'ws://localhost:3000/cable';
+	endpoint = "http://localhost:3000/api";
+	// socketUrl = 'wss://dev-api.divercity.io/cable';
+	// endpoint = "https://dev-api.divercity.io/api";
 
 	base_endpoint = 'http://localhost:5000'
 }else{
@@ -124,7 +124,7 @@ var initChatHistory = function(other_user, chat_id){
 	console.log('Fetch Chat History')
 	return $.ajax({
 	    type: "GET",
-	    url: endpoint + `/users/${getCurrentUser().id}/chats/${chat_id}?other_user=${other_user}`,
+	    url: endpoint + `/users/${getCurrentUser().id}/chats/${chat_id}`,
 	    headers: getUserCrendentials(),
 	    dataType: "json",
 	});

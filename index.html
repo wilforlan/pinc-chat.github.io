@@ -110,7 +110,7 @@ input[type=text]:focus {
 				}
 				var foo = [];
 				for (var i = 0; i < search_data.length; i++) {
-					foo.push($(`<li><a href='${base_endpoint}/chat.html?other_user=${search_data[i].id}' >${search_data[i].attributes.name}</a></li>`))
+					foo.push($(`<li><a href='${base_endpoint}/chat.html?other_user=${search_data[i].id}&existing=0' >${search_data[i].attributes.name}</a></li>`))
 				}
 
 				$('#loader').hide();
@@ -131,7 +131,7 @@ input[type=text]:focus {
 				}
 				var foo = [];
 				for (var i = 0; i < response.length; i++) {
-					foo.push($(`<li><a href='${base_endpoint}/chat.html?other_user=${response[i].id}' >${response[i].name}<br/><p>last message: ${response[i].last_message}</p></a></li>`))
+					foo.push($(`<li><a href='${base_endpoint}/chat.html?other_user=${response[i].id}&chat_id=${response[i].chat_id}&existing=1' >${response[i].name}<br/><p>last message: ${response[i].last_message}</p></a></li>`))
 				}
 
 				$.each(foo, function(){
